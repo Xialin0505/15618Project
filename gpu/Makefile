@@ -22,10 +22,8 @@ all: $(EXECUTABLE)
 default: $(EXECUTABLE)
 
 clean:
-	rm -rf $(EXECUTABLE)
+	rm -rf $(EXECUTABLE) *.txt
 
 $(EXECUTABLE): $(CU_FILES)
 	$(NVCC) $(NVCCFLAGS) -o $(EXECUTABLE) $(CU_FILES)
 
-clean:
-	rm $(EXECUTABLE)
