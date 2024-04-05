@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
+#include <time.h>
 
 #define INFINITE_DIST 1000000000
 
@@ -138,6 +139,20 @@ void write_output() {
     out_file.close();
 }
 
+struct timespec diff(struct timespec start, struct timespec end)
+{
+    struct timespec temp;
+    if ((end.tv_nsec - start.tv_nsec)<0) {
+        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+    }
+    else {
+        temp.tv_sec = end.tv_sec - start.tv_sec;
+        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+    }
+    return temp;
+}
+
 int main(int argc, char *argv[]) {
     int opt;
 
@@ -160,6 +175,15 @@ int main(int argc, char *argv[]) {
     }
 
     contructGraph();
+
+    struct timespec start_time, end_time, delta;
+
+    clock_gettime(CLOCK_REALTIME, &start_time);
     dijkstraCPUSerial(graph, dist, parent, visited, start);
+    clock_gettime(CLOCK_REALTIME, &end_time);
+    
+    delta = diff(start_time, end_time); 
+    printf("execution time: %d.%.9ld s\n", (int)delta.tv_sec, delta.tv_nsec);
+
     write_output();
 }
