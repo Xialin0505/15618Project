@@ -90,6 +90,13 @@ void contructGraph() {
     fin.close();
 }
 
+void clean() {
+    free(graph);
+    free(dist);
+    free(parent);
+    free(visited);
+}
+
 void write_graph() {
     std::ofstream out_file("test.txt", std::fstream::out);
     out_file << vertex_number << ' ' << start << '\n';
@@ -152,5 +159,6 @@ int main(int argc, char *argv[]) {
 
     contructGraph();
 
+    clean();
     return 0;
 }

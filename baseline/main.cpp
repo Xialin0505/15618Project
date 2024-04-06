@@ -153,6 +153,13 @@ struct timespec diff(struct timespec start, struct timespec end)
     return temp;
 }
 
+void clean() {
+    free(graph);
+    free(dist);
+    free(parent);
+    free(visited);
+}
+
 int main(int argc, char *argv[]) {
     int opt;
 
@@ -186,4 +193,5 @@ int main(int argc, char *argv[]) {
     printf("execution time: %d.%.9ld s\n", (int)delta.tv_sec, delta.tv_nsec);
 
     write_output();
+    clean();
 }

@@ -1,0 +1,1 @@
+./bin/host -f ../data/graph_16.txt -o output.txt
