@@ -10,16 +10,11 @@
 #include <fstream>
 
 //Parameters; modify as needed
-// #define VERTICES 16384           //number of vertices
-// #define DENSITY 16              //minimum number of edges per vertex. DO NOT SET TO >= VERTICES
-#define MAX_WEIGHT 100000      //max edge length + 1
-#define INF_DIST 1000000000     //"infinity" initial value of each node
-#define CPU_IMP 1               //number of Dijkstra implementations (non-GPU)
-#define GPU_IMP 1               //number of Dijkstra implementations (GPU)
+#define MAX_WEIGHT 100000      
+#define INF_DIST 1000000000     
 #define THREADS 2               //number of OMP threads
 #define RAND_SEED 1234          //random seed
-#define THREADS_BLOCK 32
-
+#define THREADS_BLOCK 512
 
 int vertex_number;
 float* dist;
