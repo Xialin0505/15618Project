@@ -1,7 +1,7 @@
-EXECUTABLE := main
+EXECUTABLE := baseline
 CU_FILES   := 
 CU_DEPS    :=
-CC_FILES   := main.cpp
+CC_FILES   := baseline.cpp
 
 
 CXX=g++ -m64
