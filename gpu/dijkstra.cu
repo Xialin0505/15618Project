@@ -18,7 +18,7 @@
 #define GPU_IMP 1               //number of Dijkstra implementations (GPU)
 #define THREADS 2               //number of OMP threads
 #define RAND_SEED 1234          //random seed
-#define THREADS_BLOCK 16
+#define THREADS_BLOCK 32
 
 
 int vertex_number;
