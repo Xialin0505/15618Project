@@ -10,15 +10,15 @@
 #include <fstream>
 
 //Parameters; modify as needed
-#define VERTICES 16384           //number of vertices
-#define DENSITY 16              //minimum number of edges per vertex. DO NOT SET TO >= VERTICES
+// #define VERTICES 16384           //number of vertices
+// #define DENSITY 16              //minimum number of edges per vertex. DO NOT SET TO >= VERTICES
 #define MAX_WEIGHT 100000      //max edge length + 1
 #define INF_DIST 1000000000     //"infinity" initial value of each node
 #define CPU_IMP 1               //number of Dijkstra implementations (non-GPU)
 #define GPU_IMP 1               //number of Dijkstra implementations (GPU)
 #define THREADS 2               //number of OMP threads
 #define RAND_SEED 1234          //random seed
-#define THREADS_BLOCK 512
+#define THREADS_BLOCK 16
 
 
 int vertex_number;
@@ -51,11 +51,11 @@ __global__ void closestNodeCUDA(float* node_dist, int* visited_node, int* global
     visited_node[node] = 1;
 }
 
-__global__ void cudaRelax(float* graph, float* node_dist, int* parent_node, int* visited_node, int* global_closest) {
-    int next = blockIdx.x*blockDim.x + threadIdx.x;    //global ID
+__global__ void cudaRelax(float* graph, float* node_dist, int* parent_node, int* visited_node, int* global_closest, int num_vertices) {
+    int next = blockIdx.x * blockDim.x + threadIdx.x;    //global ID
     int source = global_closest[0];
 
-    float edge = graph[source*VERTICES + next];
+    float edge = graph[source * num_vertices + next];
     float new_dist = node_dist[source] + edge;
 
     if ((edge != 0) &&
@@ -65,6 +65,89 @@ __global__ void cudaRelax(float* graph, float* node_dist, int* parent_node, int*
         parent_node[next] = source;
     }
 
+}
+
+void setIntArrayValue(int* in_array, int array_size, int init_value) {
+    int i;
+    for (i = 0; i < array_size; i++) {
+        in_array[i] = init_value;
+    }
+}
+
+/*  Initialize elements of a 1D data_t array with an initial value   */
+void setDataArrayValue(float* in_array, int array_size, float init_value) {
+    int i;
+    for (i = 0; i < array_size; i++) {
+        in_array[i] = init_value;
+    }
+}
+
+/*  Construct graph with no edges or weights     */
+void initializeGraphZero(float* graph, int num_vertices) {
+    int i, j;
+
+    for (i = 0; i < num_vertices; i++) {
+        for (j = 0; j < num_vertices; j++) {           //weight of all edges initialized to 0
+            graph[i * num_vertices + j] = (float)0;
+        }
+    }
+}
+
+void dijkstra() {
+    cudaEvent_t exec_start, exec_stop;              //timer for execution only
+    float elapsed_exec;                             //elapsed time
+    cudaEventCreate(&exec_start);
+    cudaEventCreate(&exec_stop);
+
+    float* gpu_graph;
+    float* gpu_dist;
+    int* gpu_parent;
+    int* gpu_visited;
+    cudaMalloc((void**)&gpu_graph, graph_size);
+    cudaMalloc((void**)&gpu_dist, data_array);
+    cudaMalloc((void**)&gpu_parent, int_array);
+    cudaMalloc((void**)&gpu_visited, int_array);
+
+    int* closest = (int*)malloc(sizeof(int));
+    *closest = -1;
+    int* gpu_closest;
+    cudaMalloc((void**)&gpu_closest, sizeof(int));
+    cudaMemcpy(gpu_closest, closest, sizeof(int), cudaMemcpyHostToDevice);
+
+    setDataArrayValue(dist, vertex_number, INF_DIST);
+    setIntArrayValue(parent, vertex_number, -1);
+    setIntArrayValue(visited, vertex_number, 0);
+    dist[start] = 0;
+
+    cudaMemcpy(gpu_graph, graph, graph_size, cudaMemcpyHostToDevice);
+    cudaMemcpy(gpu_dist, dist, data_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(gpu_parent, parent, int_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(gpu_visited, visited, int_array, cudaMemcpyHostToDevice);
+
+    dim3 gridClosest(1, 1, 1);
+    dim3 blockClosest(1, 1, 1);
+
+    dim3 gridRelax(vertex_number / THREADS_BLOCK, 1, 1);
+    dim3 blockRelax(THREADS_BLOCK, 1, 1);
+
+    cudaEventRecord(exec_start);
+    for (int i = 0; i < vertex_number; i++) {
+        closestNodeCUDA<<<gridClosest, blockClosest>>>(gpu_dist, gpu_visited, gpu_closest, vertex_number);
+        cudaRelax<<<gridRelax, blockRelax>>>(gpu_graph, gpu_dist, gpu_parent, gpu_visited, gpu_closest, vertex_number);
+    }
+    cudaEventRecord(exec_stop);
+
+    cudaMemcpy(dist, gpu_dist, data_array, cudaMemcpyDeviceToHost);
+    cudaMemcpy(parent, gpu_parent, int_array, cudaMemcpyDeviceToHost);
+    cudaMemcpy(visited, gpu_visited, int_array, cudaMemcpyDeviceToHost);
+
+    cudaFree(gpu_graph);
+    cudaFree(gpu_dist);
+    cudaFree(gpu_parent);
+    cudaFree(gpu_visited);
+
+    cudaEventElapsedTime(&elapsed_exec, exec_start, exec_stop);
+    printf("\n\nCUDA Time (ms): %7.9f\n", elapsed_exec);
 }
 
 void contructGraph() {
@@ -158,7 +241,8 @@ int main(int argc, char *argv[]) {
     }
 
     contructGraph();
-
+    dijkstra();
+    write_output();
     clean();
     return 0;
 }
