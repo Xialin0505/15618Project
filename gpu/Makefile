@@ -1,5 +1,5 @@
-EXECUTABLE := dijkstra
-CU_FILES   := dijkstra.cu
+EXECUTABLE := dijkstra_parallel
+CU_FILES   := dijkstra_parallel.cu
 CU_DEPS    :=
 CC_FILES   := 
 
