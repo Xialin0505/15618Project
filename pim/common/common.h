@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "stdlib.h"
 
-#define BLOCK_SIZE 8
+#define BLOCK_SIZE sizeof(int64_t)
 
 #define XSTR(x) STR(x)
 #define STR(x) #x

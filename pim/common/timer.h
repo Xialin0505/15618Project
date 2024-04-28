@@ -34,6 +34,7 @@
  */
 
 #include <sys/time.h>
+#include <time.h>
 
 typedef struct Timer{
 
@@ -43,17 +44,31 @@ typedef struct Timer{
 
 }Timer;
 
-void start(Timer *timer, int i, int rep) {
+void startTime(Timer *timer, int i, int rep) {
     if(rep == 0) {
         timer->time[i] = 0.0;
     }
     gettimeofday(&timer->startTime[i], NULL);
 }
 
-void stop(Timer *timer, int i) {
+void stopTime(Timer *timer, int i) {
     gettimeofday(&timer->stopTime[i], NULL);
     timer->time[i] += (timer->stopTime[i].tv_sec - timer->startTime[i].tv_sec) * 1000000.0 +
                       (timer->stopTime[i].tv_usec - timer->startTime[i].tv_usec);
 }
 
 void print(Timer *timer, int i, int REP) { printf("%f\t", timer->time[i] / (1000 * REP)); }
+
+struct timespec diff(struct timespec start, struct timespec end)
+{
+    struct timespec temp;
+    if ((end.tv_nsec - start.tv_nsec)<0) {
+        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+    }
+    else {
+        temp.tv_sec = end.tv_sec - start.tv_sec;
+        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+    }
+    return temp;
+}
