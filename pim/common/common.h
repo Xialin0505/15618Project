@@ -12,7 +12,8 @@
 #define DPU_BUFFER dpu_mram_buffer
 #define DPU_CACHES dpu_wram_caches
 
-#define VERTEX_NUM_EACH_TASKLET 16
+#define TOTAL_VERTEX 16
+#define VERTEX_NUM_EACH_TASKLET TOTAL_VERTEX/NR_TASKLETS
 #define INFINITE_DIST 1000000000
 
 typedef struct {

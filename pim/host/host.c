@@ -178,9 +178,9 @@ void dijkstra() {
     delta = diff(start_time, end_time); 
     printf("execution time: %d.%.9ld s\n", (int)delta.tv_sec, delta.tv_nsec);
 
-    // DPU_FOREACH (dpu_set, dpu) {
-    //     DPU_ASSERT(dpu_log_read(dpu, stdout));
-    // }
+    DPU_FOREACH (dpu_set, dpu) {
+        DPU_ASSERT(dpu_log_read(dpu, stdout));
+    }
 
     uint32_t each_dpu;
     DPU_FOREACH (dpu_set, dpu, each_dpu) {
