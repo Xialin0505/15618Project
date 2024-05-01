@@ -31,3 +31,10 @@ The output file generated can be tested against the serial version to check the 
 ### PIM
 The macro `VERTEX_NUM_EACH_TASKLET` in `commmon.h` must match the input vertex number to get the correct result
 Due to the small stack and heap size of each DPU, DPU is unable to process vertex number more than 1024.
+
+The pim is run as the following
+```
+./bin/dijkstra_host -f input_filename -o output_filename
+```
+
+Note that the pim code have to be run in the directory.
