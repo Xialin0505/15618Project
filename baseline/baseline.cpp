@@ -6,10 +6,10 @@
 #define INFINITE_DIST 1000000000
 
 int vertex_number;
-float* dist;
+int* dist;
 int* visited;
 int* parent;
-float* graph;
+int* graph;
 int start;
 std::string input_file;
 std::string output_file;
@@ -19,11 +19,11 @@ int int_array;
 int data_array;
 
 void setIntArrayValue(int* in_array, int array_size, int init_value);
-void setDataArrayValue(float* in_array, int array_size, float init_value);
-int closestNode(float* node_dist, int* visited_node, int num_vertices);
+void setDataArrayValue(int* in_array, int array_size, int init_value);
+int closestNode(int* node_dist, int* visited_node, int num_vertices);
 
-int closestNode(float* node_dist, int* visited_node) {
-    float distance = INFINITE_DIST + 1;    //set start to infinity+1, so guaranteed to pull out at least one node
+int closestNode(int* node_dist, int* visited_node) {
+    int distance = INFINITE_DIST + 1;    //set start to infinity+1, so guaranteed to pull out at least one node
     int node = -1;              //closest non-visited node
     int i;                      //iterator
 
@@ -36,7 +36,7 @@ int closestNode(float* node_dist, int* visited_node) {
     return node;    //return closest node
 }
 
-void dijkstraCPUSerial(float* graph, float* node_dist, int* parent_node, int* visited_node, int v_start) {
+void dijkstraCPUSerial(int* graph, int* node_dist, int* parent_node, int* visited_node, int v_start) {
 
     //reset/clear data from previous runs
     setDataArrayValue(node_dist, vertex_number, INFINITE_DIST);     //all node distances are infinity
@@ -48,16 +48,12 @@ void dijkstraCPUSerial(float* graph, float* node_dist, int* parent_node, int* vi
     for (i = 0; i < vertex_number; i++) {
         int curr_node = closestNode(node_dist, visited_node); //get closest node not visited
         visited_node[curr_node] = 1;                                        //set node retrieved as visited
-        /*
-        Requirements to update neighbor's distance:
-        -Neighboring node has not been visited.
-        -Edge exists between current node and neighbor node
-        -dist[curr_node] + edge_weight(curr_node, next_node) < dist[next_node]
-        */
+
         for (next = 0; next < vertex_number; next++) {
             int new_dist = node_dist[curr_node] + graph[curr_node * vertex_number + next];
+            
             if ((visited_node[next] != 1)
-                && (graph[curr_node * vertex_number + next] != (float)(0))
+                && (graph[curr_node * vertex_number + next] != (int)(0))
                 && (new_dist < node_dist[next])) {
                 node_dist[next] = new_dist;        //update distance
                 parent_node[next] = curr_node;     //update predecessor
@@ -74,7 +70,7 @@ void setIntArrayValue(int* in_array, int array_size, int init_value) {
 }
 
 /*  Initialize elements of a 1D data_t array with an initial value   */
-void setDataArrayValue(float* in_array, int array_size, float init_value) {
+void setDataArrayValue(int* in_array, int array_size, int init_value) {
     int i;
     for (i = 0; i < array_size; i++) {
         in_array[i] = init_value;
@@ -82,12 +78,12 @@ void setDataArrayValue(float* in_array, int array_size, float init_value) {
 }
 
 /*  Construct graph with no edges or weights     */
-void initializeGraphZero(float* graph, int num_vertices) {
+void initializeGraphZero(int* graph, int num_vertices) {
     int i, j;
 
     for (i = 0; i < num_vertices; i++) {
         for (j = 0; j < num_vertices; j++) {           //weight of all edges initialized to 0
-            graph[i * num_vertices + j] = (float)0;
+            graph[i * num_vertices + j] = (int)0;
         }
     }
 }
@@ -97,12 +93,12 @@ void contructGraph() {
     fin >> vertex_number >> start; 
     printf("%s: vertex %d, start %d\n", input_file.c_str(), vertex_number, start);
 
-    graph_size = vertex_number * vertex_number * sizeof(float);
+    graph_size = vertex_number * vertex_number * sizeof(int);
     int_array = vertex_number * sizeof(int);
-    data_array = vertex_number * sizeof(float);
+    data_array = vertex_number * sizeof(int);
 
-    graph = (float*)malloc(graph_size);
-    dist = (float*)malloc(data_array);
+    graph = (int*)malloc(graph_size);
+    dist = (int*)malloc(data_array);
     parent = (int*)malloc(int_array);
     visited = (int*)malloc(int_array);
 
@@ -121,7 +117,7 @@ void write_graph() {
 
     for (int i = 0; i < vertex_number; i++) {
         for (int j = 0; j < vertex_number; j++) {
-            float weight = graph[i * vertex_number + j];
+            int weight = graph[i * vertex_number + j];
             out_file << weight << ' ';
         }
         out_file << "\n";
