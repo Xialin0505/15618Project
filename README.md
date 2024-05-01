@@ -29,3 +29,5 @@ The program take a input graph file located in the `data` folder, and the output
 The output file generated can be tested against the serial version to check the correctness using `diff`.
 
 ### PIM
+The macro `VERTEX_NUM_EACH_TASKLET` in `commmon.h` must match the input vertex number to get the correct result
+Due to the small stack and heap size of each DPU, DPU is unable to process vertex number more than 1024.

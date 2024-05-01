@@ -142,9 +142,9 @@ void dijkstra() {
     DPU_ASSERT(dpu_load(dpu_set, DPU_BINARY, NULL));
 
     DPU_ASSERT(dpu_get_nr_dpus(dpu_set, &nr_of_dpus));
-    printf("Allocated %d DPU(s)\n", nr_of_dpus);
+    // printf("Allocated %d DPU(s)\n", nr_of_dpus);
 
-    printf("Load input data\n");
+    // printf("Load input data\n");
     DPU_FOREACH(dpu_set, dpu)
 	{
 		DPU_ASSERT(dpu_prepare_xfer(dpu, graph));
@@ -153,7 +153,7 @@ void dijkstra() {
 	DPU_ASSERT(dpu_push_xfer(dpu_set, DPU_XFER_TO_DPU, DPU_MRAM_HEAP_POINTER_NAME, 0, graph_size, DPU_XFER_DEFAULT));
     //DPU_ASSERT(dpu_push_xfer(dpu_set, DPU_XFER_TO_DPU, "graph", 0, graph_size, DPU_XFER_DEFAULT));
 
-    printf("Load vertex\n");
+    // printf("Load vertex\n");
     int interval = vertex_number / NR_DPUS;
     int eachdpu;
     dpu_arg args[NR_DPUS];
@@ -177,10 +177,6 @@ void dijkstra() {
     
     delta = diff(start_time, end_time); 
     printf("execution time: %d.%.9ld s\n", (int)delta.tv_sec, delta.tv_nsec);
-
-    // DPU_FOREACH (dpu_set, dpu) {
-    //     DPU_ASSERT(dpu_log_read(dpu, stdout));
-    // }
 
     uint32_t each_dpu;
     DPU_FOREACH (dpu_set, dpu, each_dpu) {

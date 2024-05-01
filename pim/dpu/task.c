@@ -10,7 +10,6 @@
 
 __host dpu_results_t DPU_RESULTS;
 __host dpu_arg DPU_ARG;
-//__host int graph[16*16];
 
 int closestNode(int* node_dist, int* visited_node) {
     int distance = INFINITE_DIST + 1;  

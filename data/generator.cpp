@@ -8,6 +8,7 @@
 // parameter
 std::string output_filename;
 int vertex_number;
+float density_perc;
 int density;
 int start;
 
@@ -24,6 +25,7 @@ void init() {
     int_array = vertex_number * sizeof(int); 
     graph = (float*)malloc(graph_size * sizeof(float));
     edge_count = (int*)malloc(int_array);
+    density = (float)vertex_number * density_perc;
 
     start = (rand() % vertex_number);
 }
@@ -94,10 +96,10 @@ int main(int argc, char *argv[]) {
             vertex_number = atof(optarg);
             break;
         case 'd':
-            density = atoi(optarg);
+            density_perc = atof(optarg);
             break;
         default:
-            std::cerr << "Usage: " << argv[0] << " -f output_filename -v vertex_number -d density\n";
+            std::cerr << "Usage: " << argv[0] << " -f output_filename -v vertex_number -d density in percentage\n";
         }
     }
 
