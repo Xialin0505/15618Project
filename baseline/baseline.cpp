@@ -2,6 +2,11 @@
 #include <unistd.h>
 #include <fstream>
 #include <time.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <x86intrin.h>
 
 #define INFINITE_DIST 1000000000
 
@@ -181,9 +186,14 @@ int main(int argc, char *argv[]) {
 
     struct timespec start_time, end_time, delta;
 
+    uint64_t start_cycle = _rdtsc();
     clock_gettime(CLOCK_REALTIME, &start_time);
     dijkstraCPUSerial(graph, dist, parent, visited, start);
     clock_gettime(CLOCK_REALTIME, &end_time);
+    uint64_t end_cycle = _rdtsc();
+
+    double cycles = (double)(end_cycle - start_cycle);
+	printf("Total CPU cycles : %g\n", cycles);
     
     delta = diff(start_time, end_time); 
     printf("execution time: %d.%.9ld s\n", (int)delta.tv_sec, delta.tv_nsec);

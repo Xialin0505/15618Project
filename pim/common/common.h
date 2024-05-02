@@ -12,11 +12,12 @@
 #define DPU_BUFFER dpu_mram_buffer
 #define DPU_CACHES dpu_wram_caches
 
-#define VERTEX_NUM_EACH_TASKLET 1024
+#define VERTEX_NUM_EACH_TASKLET 64
 #define INFINITE_DIST 1000000000
 
 typedef struct {
     uint32_t pathlength[VERTEX_NUM_EACH_TASKLET];
+    uint32_t cycles;
 } dpu_result_t;
 
 typedef struct {

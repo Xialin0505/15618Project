@@ -186,10 +186,14 @@ void dijkstra() {
     DPU_ASSERT(dpu_push_xfer(dpu_set, DPU_XFER_FROM_DPU, "DPU_RESULTS", 0, sizeof(dpu_results_t), DPU_XFER_DEFAULT));
 
     int idx = 0;
+    uint32_t cycles = 0;
     DPU_FOREACH (dpu_set, dpu, each_dpu) {
         for (unsigned int each_tasklet = 0; each_tasklet < NR_TASKLETS; each_tasklet++) {
             dpu_result_t *result = &results[each_dpu].tasklet_result[each_tasklet];
             
+            if (result->cycles > cycles)
+                cycles = result->cycles;
+
             for (int i = 0; i < VERTEX_NUM_EACH_TASKLET; i++){
                 dist[idx] = result->pathlength[i];
                 idx ++;
@@ -197,6 +201,8 @@ void dijkstra() {
             }
         }
     }
+
+    printf("DPU cycle %d\n", cycles);
 
     DPU_ASSERT(dpu_free(dpu_set));
 }

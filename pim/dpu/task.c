@@ -48,6 +48,9 @@ int main() {
     int *visited_node = (int *)mem_alloc(DPU_ARG.num_vertex * sizeof(int));
     int64_t cost;
  
+    if (tasklet_id == 0)
+        perfcounter_config(COUNT_CYCLES, true);
+    
     for (int i = 0; i < DPU_ARG.num_vertex; i++) {
         node_dist[i] = INFINITE_DIST;
         visited_node[i] = 0;
@@ -77,6 +80,7 @@ int main() {
     for (int i = 0; i < VERTEX_NUM_EACH_TASKLET; i++) {
         result->pathlength[i] = node_dist[i];
     }
+    result->cycles = (uint32_t)perfcounter_get();
 
     return 0;
 }
